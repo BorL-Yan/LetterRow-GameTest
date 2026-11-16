@@ -1,0 +1,5 @@
+*.unityweb binary
+*.wasm binary
+*.data binary
+*.gz binary
+*.br binary
