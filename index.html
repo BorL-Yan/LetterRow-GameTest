@@ -40,7 +40,7 @@
 
     <script>
       // Filled in by Tools → Build → WebGL → GitHub Pages. A manual build keeps the placeholder.
-      var BUILD_STAMP = "20261117-011224";
+      var BUILD_STAMP = "20261118-100841";
       var stamped = BUILD_STAMP.indexOf("__") !== 0;
       var query = new URLSearchParams(location.search);
 
@@ -88,6 +88,10 @@
 
       var buildUrl = "Build";
       var v = stamped ? "?v=" + BUILD_STAMP : "";
+
+      // Level analytics → Firebase (Assets/Scripts/Analytics/Docs/Analytics_Firebase_Plan.md §5.5).
+      // Unity talks to it through FirebaseBridge.jslib; calls made before it loads wait in a queue.
+      import("./firebase-bridge.js" + v).catch(function (e) { console.warn("[Analytics] firebase-bridge.js:", e); });
       var config = {
         arguments: [],
         dataUrl: buildUrl + "/WebGL.data.unityweb" + v,
