@@ -207,10 +207,11 @@ async function initAnalytics() {
     const analytics = an.getAnalytics(fb.app);
     fb.an = an;
     fb.analytics = analytics;
-    if (config.installId) an.setUserId(analytics, config.installId);
+    // global: true = gtag('set', ...) right away; the default path (config update) arrived after the first events.
+    if (config.installId) an.setUserId(analytics, config.installId, { global: true });
     if (config.tester) userProps.tester = config.tester;
     if (config.build) userProps.build = config.build;
-    if (Object.keys(userProps).length > 0) an.setUserProperties(analytics, userProps);
+    if (Object.keys(userProps).length > 0) an.setUserProperties(analytics, userProps, { global: true });
     state.analytics = "on";
     logEventNow("game_loaded", { load_sec: state.loadSec, build: config.build || "" });
     for (const [name, params] of eventBuffer.splice(0)) logEventNow(name, params);
@@ -221,6 +222,8 @@ async function initAnalytics() {
   }
 }
 
+// ?debug: debug_mode on every event (it travels as ep.debug_mode, and DebugView picks it up; checked 2026-11-18).
+// debug_mode in the initializeAnalytics config did NOT reach DebugView: Firebase sends it as a config update.
 function logEventNow(name, params) {
   try {
     const p = Object.assign({}, params);
@@ -317,7 +320,7 @@ const api = {
     userProps[name] = value;
     if (fb && fb.analytics) {
       try {
-        fb.an.setUserProperties(fb.analytics, { [name]: value });
+        fb.an.setUserProperties(fb.analytics, { [name]: value }, { global: true });
       } catch (e) {
         note(e);
       }
